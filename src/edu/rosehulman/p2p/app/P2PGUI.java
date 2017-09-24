@@ -30,6 +30,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -49,8 +50,10 @@ import edu.rosehulman.p2p.app.gui.ConnectionListener;
 import edu.rosehulman.p2p.app.gui.DownloadListener;
 import edu.rosehulman.p2p.app.gui.ListingListener;
 import edu.rosehulman.p2p.app.gui.RequestLogListener;
+import edu.rosehulman.p2p.app.gui.SearchNetworkListener;
 import edu.rosehulman.p2p.impl.Host;
 import edu.rosehulman.p2p.impl.mediator.DetachMediator;
+import edu.rosehulman.p2p.impl.mediator.FindMediator;
 import edu.rosehulman.p2p.impl.mediator.GetMediator;
 import edu.rosehulman.p2p.impl.mediator.ListMediator;
 import edu.rosehulman.p2p.impl.mediator.RequestAttachMediator;
@@ -59,6 +62,7 @@ import edu.rosehulman.p2p.impl.notification.IConnectionListener;
 import edu.rosehulman.p2p.impl.notification.IDownloadListener;
 import edu.rosehulman.p2p.impl.notification.IListingListener;
 import edu.rosehulman.p2p.impl.notification.IRequestLogListener;
+import edu.rosehulman.p2p.impl.notification.ISearchNetworkListener;
 import edu.rosehulman.p2p.protocol.IConnectionMonitor;
 import edu.rosehulman.p2p.protocol.IHost;
 import edu.rosehulman.p2p.protocol.IP2PMediator;
@@ -121,6 +125,7 @@ public class P2PGUI {
 	public IDownloadListener downloadListener;
 	public IListingListener listingListener;
 	public IRequestLogListener requestLogListener;
+	public ISearchNetworkListener searchNetworkListener;
 
 	private void initListeners() {
 		this.activityListener = new ActivityListener(this.statusTextArea);
@@ -128,6 +133,7 @@ public class P2PGUI {
 		this.downloadListener = new DownloadListener(this.statusTextArea);
 		this.listingListener = new ListingListener(this.fileListModel, this.statusTextArea);
 		this.requestLogListener = new RequestLogListener(this.requestLogListModel);
+		this.searchNetworkListener = new SearchNetworkListener(this.searchTermField);
 	}
 
 	public void show() {
@@ -151,10 +157,10 @@ public class P2PGUI {
 		this.frame.setTitle("Rose P2P App (" + IProtocol.PROTOCOL + ") - Localhost [" + this.mediator.getLocalHost() + "]");
 		this.contentPane = (JPanel) this.frame.getContentPane();
 
-		configurePeersPanel();
 		createNetworkMapPanel();
 		createSearchPanel();
 		createStatusPanel();
+		configurePeersPanel();
 
 		this.contentPane.add(this.peersPanel, BorderLayout.WEST);
 		this.contentPane.add(this.networkMapPanel, BorderLayout.CENTER);
@@ -297,6 +303,34 @@ public class P2PGUI {
 						postStatus("Getting file " + fileName + " from " + remoteHost + "...");
 					} catch (Exception e) {
 						postStatus("Error sending the get file request to " + remoteHost + "!");
+						e.printStackTrace();
+					}
+				}
+			};
+			thread.start();
+		});
+
+		this.searchButton.addActionListener(e -> {
+			ArrayList<IHost> peers = new ArrayList<>();
+			for (int i = 0; i < this.peerList.getModel().getSize(); i++) {
+				peers.add(this.peerList.getModel().getElementAt(i));
+			}
+			String filename = P2PGUI.this.searchTermField.getText();
+			if (peers.size() == 0 || filename == null || filename.isEmpty()) {
+				JOptionPane.showMessageDialog(	P2PGUI.this.frame,
+												"You must have connected to at least one peer and a search term",
+												"P2P Error",
+												JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			Thread thread = new Thread() {
+				@Override
+				public void run() {
+					try {
+						P2PGUI.this.mediator.mediate(FindMediator.NAME, peers, filename);
+						postStatus("Searching network of peers for " + filename);
+					} catch (Exception e) {
+						postStatus("Error searching network of peers!");
 						e.printStackTrace();
 					}
 				}

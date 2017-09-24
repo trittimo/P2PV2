@@ -29,12 +29,15 @@ import javax.swing.JFrame;
 import edu.rosehulman.p2p.impl.ConnectionMonitor;
 import edu.rosehulman.p2p.impl.P2PMediator;
 import edu.rosehulman.p2p.impl.Protocol;
+import edu.rosehulman.p2p.impl.handlers.FindRequestHandler;
 import edu.rosehulman.p2p.impl.handlers.GetRequestHandler;
 import edu.rosehulman.p2p.impl.handlers.ListRequestHandler;
 import edu.rosehulman.p2p.impl.handlers.ListingRequestHandler;
 import edu.rosehulman.p2p.impl.handlers.PutRequestHandler;
 import edu.rosehulman.p2p.impl.handlers.PutResponseHandler;
 import edu.rosehulman.p2p.impl.mediator.DetachMediator;
+import edu.rosehulman.p2p.impl.mediator.FindMediator;
+import edu.rosehulman.p2p.impl.mediator.FindRequestMediator;
 import edu.rosehulman.p2p.impl.mediator.GetMediator;
 import edu.rosehulman.p2p.impl.mediator.ListMediator;
 import edu.rosehulman.p2p.impl.mediator.ListingMediator;
@@ -47,6 +50,7 @@ import edu.rosehulman.p2p.impl.notification.IConnectionListener;
 import edu.rosehulman.p2p.impl.notification.IDownloadListener;
 import edu.rosehulman.p2p.impl.notification.IListingListener;
 import edu.rosehulman.p2p.impl.notification.IRequestLogListener;
+import edu.rosehulman.p2p.impl.notification.ISearchNetworkListener;
 import edu.rosehulman.p2p.protocol.IConnectionMonitor;
 import edu.rosehulman.p2p.protocol.IP2PMediator;
 import edu.rosehulman.p2p.protocol.IProtocol;
@@ -66,9 +70,10 @@ public class P2PApp {
 		// Get the settings
 		String rootDirectory = configWindow.getRootDirectory();
 		int port = configWindow.getPort();
+		int maxDepth = configWindow.getMaxDepth();
 
 		// Configure the main worker that mediates between peers
-		IP2PMediator mediator = new P2PMediator(port, rootDirectory);
+		IP2PMediator mediator = new P2PMediator(port, rootDirectory, maxDepth);
 
 		// Add the mediators to our main P2PMediator
 		mediator.addMediationHandler(DetachMediator.NAME, new DetachMediator(mediator));
@@ -79,6 +84,8 @@ public class P2PApp {
 		mediator.addMediationHandler(PutMediator.NAME, new PutMediator(mediator));
 		mediator.addMediationHandler(ListingMediator.NAME, new ListingMediator(mediator));
 		mediator.addMediationHandler(ListMediator.NAME, new ListMediator(mediator));
+		mediator.addMediationHandler(FindMediator.NAME, new FindMediator(mediator));
+		mediator.addMediationHandler(FindRequestMediator.NAME, new FindRequestMediator(mediator));
 		// TODO add the rest of these
 
 		// Configure the protocol by setting up handlers
@@ -88,6 +95,7 @@ public class P2PApp {
 		protocol.setResponseHandler(IProtocol.PUT, new PutResponseHandler(mediator));
 		protocol.setRequestHandler(IProtocol.LIST, new ListRequestHandler(mediator));
 		protocol.setRequestHandler(IProtocol.LISTING, new ListingRequestHandler(mediator));
+		protocol.setRequestHandler(IProtocol.FIND, new FindRequestHandler(mediator));
 
 		// Let's start a connection monitor that listens for incoming connection request
 		IConnectionMonitor connectionMonitor = new ConnectionMonitor(mediator);
@@ -101,6 +109,7 @@ public class P2PApp {
 		mediator.addListener(IDownloadListener.NAME, gui.downloadListener);
 		mediator.addListener(IListingListener.NAME, gui.listingListener);
 		mediator.addListener(IRequestLogListener.NAME, gui.requestLogListener);
+		mediator.addListener(ISearchNetworkListener.NAME, gui.searchNetworkListener);
 
 		// Show the gui
 		gui.show();

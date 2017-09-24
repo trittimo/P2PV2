@@ -52,7 +52,7 @@ public class P2PMediator implements IP2PMediator {
 	private HashMap<String, IMediationHandler> mediationHandlers;
 	private HashMap<String, List<IListener>> listeners;
 
-	public P2PMediator(int port, String rootDirectory) throws UnknownHostException {
+	public P2PMediator(int port, String rootDirectory, int maxDepth) throws UnknownHostException {
 		this.mediationHandlers = new HashMap<>();
 		this.listeners = new HashMap<>();
 		this.sharedResources = new HashMap<>();
@@ -70,6 +70,7 @@ public class P2PMediator implements IP2PMediator {
 								Collections.synchronizedList(new ArrayList<IConnectionListener>()));
 		this.addSharedResource("activityListeners", Collections.synchronizedList(new ArrayList<IActivityListener>()));
 		this.addSharedResource("sequence", 0);
+		this.addSharedResource("maxDepth", maxDepth);
 
 	}
 
@@ -142,6 +143,7 @@ public class P2PMediator implements IP2PMediator {
 		this.listeners.get(listenerType).add(listener);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private Method getMethod(Class clazz, String methodName) throws P2PException {
 		for (Method m : clazz.getMethods()) {
 			if (m.getName().equals(methodName)) {

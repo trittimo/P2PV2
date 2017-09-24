@@ -18,8 +18,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package edu.rosehulman.p2p.impl;
@@ -30,7 +30,7 @@ import edu.rosehulman.p2p.protocol.IProtocol;
 public class Host implements IHost {
 	private String host;
 	private int port;
-	
+
 	public Host(String host, int port) {
 		this.host = host;
 		this.port = port;
@@ -38,44 +38,55 @@ public class Host implements IHost {
 
 	@Override
 	public String getHostAddress() {
-		return host;
+		return this.host;
 	}
 
 	@Override
 	public int getPort() {
-		return port;
+		return this.port;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((host == null) ? 0 : host.hashCode());
-		result = prime * result + port;
+		result = prime * result + (this.host == null ? 0 : this.host.hashCode());
+		result = prime * result + this.port;
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Host other = (Host) obj;
-		if (host == null) {
-			if (other.host != null)
+		if (this.host == null) {
+			if (other.host != null) {
 				return false;
-		} else if (!host.equals(other.host))
+			}
+		} else if (!this.host.equals(other.host)) {
 			return false;
-		if (port != other.port)
+		}
+		if (this.port != other.port) {
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return host + IProtocol.SEPERATOR + port;
+		return this.host + IProtocol.SEPERATOR + this.port;
+	}
+
+	public static Host fromString(String descriptor) {
+		String[] items = descriptor.split(":");
+		return new Host(items[0], Integer.parseInt(items[1]));
 	}
 }

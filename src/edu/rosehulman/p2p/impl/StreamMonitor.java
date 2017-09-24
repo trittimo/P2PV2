@@ -83,7 +83,7 @@ public class StreamMonitor implements IStreamMonitor {
 				// kick-in within the packet.fromStream() method to handle the 
 				// packet further
 			} catch (P2PException e) {
-				Logger.getGlobal().log(Level.SEVERE, "Error Receiving Packet!", e);
+				// TODO Logger.getGlobal().log(Level.SEVERE, "Error Receiving Packet!", e);
 				stop();
 			}
 		}

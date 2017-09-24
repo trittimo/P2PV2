@@ -142,16 +142,14 @@ public class P2PMediator implements IP2PMediator {
 		this.listeners.get(listenerType).add(listener);
 	}
 
-	private Class<?>[] getArgumentTypes(Object... args) {
-		Class<?>[] types = new Class<?>[args.length];
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].getClass().getInterfaces().length > 0) {
-				types[i] = args[i].getClass().getInterfaces()[0];
-			} else {
-				types[i] = args[i].getClass();
+	private Method getMethod(Class clazz, String methodName) throws P2PException {
+		for (Method m : clazz.getMethods()) {
+			if (m.getName().equals(methodName)) {
+				return m;
 			}
 		}
-		return types;
+
+		throw new P2PException("Failed to find appropriate method");
 	}
 
 	@Override
@@ -160,12 +158,15 @@ public class P2PMediator implements IP2PMediator {
 		synchronized (listeners) {
 			for (IListener listener : listeners) {
 				try {
-					Method m = listener.getClass().getMethod(eventName, getArgumentTypes(args));
+					Method m = getMethod(listener.getClass(), eventName);
 					m.invoke(listener, args);
-				} catch (NoSuchMethodException | SecurityException e) {
+				} catch (SecurityException e) {
 					// TODO Maybe deal with this error perhaps sometime later
 					e.printStackTrace();
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					// TODO Maybe deal with this error perhaps sometime later
+					e.printStackTrace();
+				} catch (P2PException e) {
 					// TODO Maybe deal with this error perhaps sometime later
 					e.printStackTrace();
 				}

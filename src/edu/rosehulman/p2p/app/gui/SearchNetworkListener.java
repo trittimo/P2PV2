@@ -1,18 +1,25 @@
 package edu.rosehulman.p2p.app.gui;
 
-import javax.swing.JTextField;
+import javax.swing.DefaultListModel;
 
 import edu.rosehulman.p2p.impl.notification.ISearchNetworkListener;
+import edu.rosehulman.p2p.protocol.IHost;
 
 public class SearchNetworkListener implements ISearchNetworkListener {
-	private JTextField textField;
 
-	public SearchNetworkListener(JTextField field) {
-		this.textField = field;
+	private DefaultListModel<String> searchResultListModel;
+
+	public SearchNetworkListener(DefaultListModel<String> searchResultList) {
+		this.searchResultListModel = searchResultList;
 	}
 
 	@Override
-	public void searchNetwork() {
+	public void fileFound(String filename, IHost finder) {
+		this.searchResultListModel.addElement(finder.toString());
+	}
 
+	@Override
+	public void fileNotFound(String filename, IHost finder) {
+		// Nothing to do here
 	}
 }

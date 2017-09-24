@@ -163,13 +163,10 @@ public class P2PMediator implements IP2PMediator {
 					Method m = getMethod(listener.getClass(), eventName);
 					m.invoke(listener, args);
 				} catch (SecurityException e) {
-					// TODO Maybe deal with this error perhaps sometime later
 					e.printStackTrace();
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					// TODO Maybe deal with this error perhaps sometime later
 					e.printStackTrace();
 				} catch (P2PException e) {
-					// TODO Maybe deal with this error perhaps sometime later
 					e.printStackTrace();
 				}
 			}

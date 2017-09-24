@@ -43,8 +43,7 @@ public interface IProtocol {
 	public static final String ATTACH_NOK = "ATTACH_NOK";
 	public static final String DETACH = "DETACH";
 
-	public static final String DISCOVER = "DISCOVER";
-
+	public static final String FOUND = "FOUND";
 	public static final String LIST = "LIST";
 	public static final String LISTING = "LISTING";
 
@@ -61,10 +60,13 @@ public interface IProtocol {
 	public static final String PAYLOAD_SIZE = "Payload-Size";
 	public static final int CHUNK_SIZE = 1024;
 	public static final String FILE_SEPERATOR = File.separator;
+	public static final String FILE_FOUND = "File-Found";
+	public static final String FINDER_HOST = "Finder-Host";
 
 	public static final String MESSAGE = "Message";
 
 	public static final String MAX_DEPTH = "Max-Depth";
+	public static final String CURRENT_DEPTH = "Current-Depth";
 	public static final String VISITED_PEERS = "Visited-Peers";
 	public static final String PEER_SEPARATOR = ",";
 

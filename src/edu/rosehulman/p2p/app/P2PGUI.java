@@ -133,7 +133,7 @@ public class P2PGUI {
 		this.downloadListener = new DownloadListener(this.statusTextArea);
 		this.listingListener = new ListingListener(this.fileListModel, this.statusTextArea);
 		this.requestLogListener = new RequestLogListener(this.requestLogListModel);
-		this.searchNetworkListener = new SearchNetworkListener(this.searchTermField);
+		this.searchNetworkListener = new SearchNetworkListener(this.searchResultListModel);
 	}
 
 	public void show() {
@@ -327,7 +327,10 @@ public class P2PGUI {
 				@Override
 				public void run() {
 					try {
-						P2PGUI.this.mediator.mediate(FindMediator.NAME, peers, filename);
+						ArrayList<IHost> visited = new ArrayList<>();
+						visited.add(P2PGUI.this.mediator.getLocalHost());
+						int maxDepth = P2PGUI.this.mediator.getSharedResource("maxDepth");
+						P2PGUI.this.mediator.mediate(FindMediator.NAME, peers, filename, visited, maxDepth, 0);
 						postStatus("Searching network of peers for " + filename);
 					} catch (Exception e) {
 						postStatus("Error searching network of peers!");

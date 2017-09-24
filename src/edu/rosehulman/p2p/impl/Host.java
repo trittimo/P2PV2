@@ -24,6 +24,8 @@
 
 package edu.rosehulman.p2p.impl;
 
+import java.util.List;
+
 import edu.rosehulman.p2p.protocol.IHost;
 import edu.rosehulman.p2p.protocol.IProtocol;
 
@@ -88,5 +90,13 @@ public class Host implements IHost {
 	public static Host fromString(String descriptor) {
 		String[] items = descriptor.split(":");
 		return new Host(items[0], Integer.parseInt(items[1]));
+	}
+
+	public static String listToString(List<IHost> hosts) {
+		String result = "";
+		for (IHost host : hosts) {
+			result += host + ",";
+		}
+		return result.substring(0, result.length() - 1);
 	}
 }

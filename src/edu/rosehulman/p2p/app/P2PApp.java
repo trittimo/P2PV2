@@ -30,6 +30,7 @@ import edu.rosehulman.p2p.impl.ConnectionMonitor;
 import edu.rosehulman.p2p.impl.P2PMediator;
 import edu.rosehulman.p2p.impl.Protocol;
 import edu.rosehulman.p2p.impl.handlers.FindRequestHandler;
+import edu.rosehulman.p2p.impl.handlers.FoundRequestHandler;
 import edu.rosehulman.p2p.impl.handlers.GetRequestHandler;
 import edu.rosehulman.p2p.impl.handlers.ListRequestHandler;
 import edu.rosehulman.p2p.impl.handlers.ListingRequestHandler;
@@ -37,7 +38,7 @@ import edu.rosehulman.p2p.impl.handlers.PutRequestHandler;
 import edu.rosehulman.p2p.impl.handlers.PutResponseHandler;
 import edu.rosehulman.p2p.impl.mediator.DetachMediator;
 import edu.rosehulman.p2p.impl.mediator.FindMediator;
-import edu.rosehulman.p2p.impl.mediator.FindRequestMediator;
+import edu.rosehulman.p2p.impl.mediator.FoundMediator;
 import edu.rosehulman.p2p.impl.mediator.GetMediator;
 import edu.rosehulman.p2p.impl.mediator.ListMediator;
 import edu.rosehulman.p2p.impl.mediator.ListingMediator;
@@ -85,8 +86,7 @@ public class P2PApp {
 		mediator.addMediationHandler(ListingMediator.NAME, new ListingMediator(mediator));
 		mediator.addMediationHandler(ListMediator.NAME, new ListMediator(mediator));
 		mediator.addMediationHandler(FindMediator.NAME, new FindMediator(mediator));
-		mediator.addMediationHandler(FindRequestMediator.NAME, new FindRequestMediator(mediator));
-		// TODO add the rest of these
+		mediator.addMediationHandler(FoundMediator.NAME, new FoundMediator(mediator));
 
 		// Configure the protocol by setting up handlers
 		IProtocol protocol = Protocol.getInstance();
@@ -96,6 +96,7 @@ public class P2PApp {
 		protocol.setRequestHandler(IProtocol.LIST, new ListRequestHandler(mediator));
 		protocol.setRequestHandler(IProtocol.LISTING, new ListingRequestHandler(mediator));
 		protocol.setRequestHandler(IProtocol.FIND, new FindRequestHandler(mediator));
+		protocol.setRequestHandler(IProtocol.FOUND, new FoundRequestHandler(mediator));
 
 		// Let's start a connection monitor that listens for incoming connection request
 		IConnectionMonitor connectionMonitor = new ConnectionMonitor(mediator);

@@ -31,6 +31,7 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -52,6 +53,7 @@ import edu.rosehulman.p2p.app.gui.ListingListener;
 import edu.rosehulman.p2p.app.gui.RequestLogListener;
 import edu.rosehulman.p2p.app.gui.SearchNetworkListener;
 import edu.rosehulman.p2p.impl.Host;
+import edu.rosehulman.p2p.impl.StreamMonitor;
 import edu.rosehulman.p2p.impl.mediator.DetachMediator;
 import edu.rosehulman.p2p.impl.mediator.FindMediator;
 import edu.rosehulman.p2p.impl.mediator.GetMediator;
@@ -303,6 +305,47 @@ public class P2PGUI {
 						postStatus("Getting file " + fileName + " from " + remoteHost + "...");
 					} catch (Exception e) {
 						postStatus("Error sending the get file request to " + remoteHost + "!");
+						e.printStackTrace();
+					}
+				}
+			};
+			thread.start();
+		});
+
+		this.downloadAfterSearch.addActionListener(e -> {
+			if (this.searchResultList.isSelectionEmpty()) {
+				JOptionPane.showMessageDialog(	P2PGUI.this.frame,
+												"You must select the peer to download from",
+												"P2P Error",
+												JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			IHost host = Host.fromString(P2PGUI.this.searchResultList.getSelectedValue());
+			String filename = P2PGUI.this.searchTermField.getText();
+			Thread thread = new Thread() {
+				@Override
+				public void run() {
+					Map<IHost, StreamMonitor> monitor = P2PGUI.this.mediator.getSharedResource("hostToInStreamMonitor");
+					if (!monitor.containsKey(host)) {
+						postStatus("Trying to connect to " + host + " ...");
+						try {
+							if ((Boolean) P2PGUI.this.mediator.mediate(RequestAttachMediator.NAME, host)) {
+								postStatus("Connected to " + host);
+							} else {
+								postStatus("Could not connect to " + host + ". Please try again!");
+								return;
+							}
+						} catch (Exception exp) {
+							postStatus("An error occured while connecting: " + exp.getMessage());
+							exp.printStackTrace();
+						}
+					}
+
+					try {
+						P2PGUI.this.mediator.mediate(GetMediator.NAME, host, filename);
+						postStatus("Getting file " + filename + " from " + host + "...");
+					} catch (Exception e) {
+						postStatus("Error sending the get file request to " + host + "!");
 						e.printStackTrace();
 					}
 				}
